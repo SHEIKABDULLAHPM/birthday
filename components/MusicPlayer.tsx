@@ -51,11 +51,10 @@ export default function MusicPlayer() {
     }
   };
 
-  // Attempt autoplay on mount (might be blocked by browser)
+  // Prepare audio element but wait for explicit trigger (timer completion)
   useEffect(() => {
     if (!audioRef.current) return;
     audioRef.current.volume = 0;
-    attemptPlay();
   }, []);
 
   useEffect(() => {
