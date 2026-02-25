@@ -66,21 +66,19 @@ export default function Home() {
         >
             {/* Background Atmosphere */}
             <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900 via-zinc-900 to-black z-[-1]" />
-            <div className="fixed inset-0 bg-[url('/noise.png')] opacity-[0.03] z-[-1] pointer-events-none mix-blend-overlay"></div>
+            {/* Noise texture removed - using gradient only for better compatibility */}
             <SpaceBackground />
 
 
-            {/* Content Container */}
-            <div className="container mx-auto px-4 py-20 flex flex-col items-center space-y-32">
-              
-              {/* Header Section */}
-              <section className="text-center space-y-8 relative pt-20 h-screen flex flex-col justify-center">
+            {/* Hero Section */}
+            <div className="w-full px-4 sm:px-6 md:px-8">
+              <section className="text-center space-y-6 md:space-y-8 relative min-h-screen flex flex-col justify-center items-center py-20">
                 <motion.div
                   initial={{ scale: 0.8, opacity: 0, filter: "blur(10px)" }}
                   animate={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
                   transition={{ duration: 1.5, ease: "easeOut" }}
                 >
-                   <h1 className="text-6xl md:text-9xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-pink-300 via-purple-300 to-indigo-400 pb-4 tracking-tight drop-shadow-[0_0_30px_rgba(236,72,153,0.3)]">
+                   <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-pink-300 via-purple-300 to-indigo-400 pb-2 md:pb-4 tracking-tight drop-shadow-[0_0_30px_rgba(236,72,153,0.3)]">
                      Happy Birthday!
                    </h1>
                 </motion.div>
@@ -89,37 +87,46 @@ export default function Home() {
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ duration: 1, delay: 0.5 }}
-                  className="text-xl md:text-2xl text-indigo-200/80 max-w-2xl mx-auto leading-relaxed font-light"
+                  className="text-base sm:text-lg md:text-xl lg:text-2xl text-indigo-200/80 max-w-xs sm:max-w-md md:max-w-xl lg:max-w-2xl mx-auto leading-relaxed font-light"
                 >
-                  "Count your life by smiles, not tears. Count your age by friends, not years."
+                  &ldquo;Count your life by smiles, not tears. Count your age by friends, not years.&rdquo;
                 </motion.p>
                 <motion.div 
                    initial={{ opacity: 0 }}
                    animate={{ opacity: 1 }}
                    transition={{ delay: 2, duration: 1 }}
-                   className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce text-gray-400"
+                   className="absolute bottom-8 md:bottom-10 left-1/2 -translate-x-1/2 animate-bounce text-gray-400 text-sm md:text-base"
                 >
                   Scroll Down ↓
                 </motion.div>
               </section>
+            </div>
 
-              {/* Memory Gallery (Vertical Timeline) */}
-              <MemoryGallery />
+            {/* Memory Gallery - Full Width for horizontal scroll */}
+            <MemoryGallery />
 
+            {/* Content Container for remaining sections */}
+            <div className="w-full flex flex-col items-center">
               {/* Joke Section */}
-              <InsideJokes />
+              <div className="w-full py-16 md:py-24">
+                <InsideJokes />
+              </div>
 
               {/* Hidden Surprise */}
-              <HiddenSurprise />
+              <div className="w-full py-16 md:py-24">
+                <HiddenSurprise />
+              </div>
 
               {/* Final Explosion */}
-              <BirthdayExplosion />
+              <div className="w-full py-16 md:py-24">
+                <BirthdayExplosion />
+              </div>
 
               {/* Footer */}
-              <footer className="text-center pb-20 pt-10 text-gray-600 text-sm">
-                 <p>Made with all my heart ❤️</p>
+              <footer className="w-full text-center py-12 md:py-16 border-t border-white/5">
+                <p className="text-gray-500 text-sm md:text-base tracking-wide">Made with all my heart ❤️</p>
+                <p className="text-gray-600 text-xs mt-2">© {new Date().getFullYear()}</p>
               </footer>
-
             </div>
         </motion.div>
       )}

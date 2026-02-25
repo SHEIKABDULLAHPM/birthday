@@ -1,11 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import confetti from "canvas-confetti";
 
 export default function InteractiveDots() {
-  const containerRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     const handleGlobalClick = (e: MouseEvent) => {
       const x = e.clientX / window.innerWidth;

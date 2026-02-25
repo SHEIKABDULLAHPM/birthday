@@ -95,6 +95,16 @@ body {
   animation: glow 3s infinite alternate;
 }
 
+/* Hide scrollbar for horizontal scroll galleries */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 .transform-style-3d {
   transform-style: preserve-3d;
 }
@@ -105,4 +115,49 @@ body {
 
 .perspective-1000 {
   perspective: 1000px;
+}
+
+/* Consistent section spacing utility */
+.section-spacing {
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+}
+
+@media (min-width: 768px) {
+  .section-spacing {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .section-spacing {
+    padding-top: 6rem;
+    padding-bottom: 6rem;
+  }
+}
+
+/* Twinkle animation for stars */
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.animate-twinkle {
+  animation: twinkle 3s ease-in-out infinite;
+}
+
+/* Delay utilities for staggered animations */
+.delay-150 { animation-delay: 150ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-500 { animation-delay: 500ms; }
+
+/* Better focus styles */
+:focus-visible {
+  outline: 2px solid rgba(236, 72, 153, 0.5);
+  outline-offset: 2px;
 }

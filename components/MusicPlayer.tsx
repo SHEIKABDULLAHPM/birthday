@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Volume2, VolumeX, Music2, Disc } from "lucide-react";
+import { Music2, Disc } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BACKGROUND_MUSIC_URL } from "@/lib/constants";
 
@@ -10,46 +10,61 @@ export default function MusicPlayer() {
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const togglePlay = () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play().catch(e => console.log("Autoplay blocked:", e));
+    if (!audioRef.current) return;
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      attemptPlay();
+    }
+  };
+
+  const smoothFadeIn = () => {
+    if (!audioRef.current) return () => undefined;
+
+    const fadeAudioIn = setInterval(() => {
+      if (audioRef.current) {
+        if (audioRef.current.volume < 0.4) {
+          audioRef.current.volume = Math.min(0.4, audioRef.current.volume + 0.05);
+        } else {
+          clearInterval(fadeAudioIn);
+        }
       }
-      setIsPlaying(!isPlaying);
+    }, 200);
+
+    return () => clearInterval(fadeAudioIn);
+  };
+
+  const attemptPlay = () => {
+    if (!audioRef.current) return;
+    smoothFadeIn();
+    const playPromise = audioRef.current.play();
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => setIsPlaying(true))
+        .catch((error) => {
+          console.log("Playback blocked:", error);
+          setIsPlaying(false);
+        });
+    } else {
+      setIsPlaying(true);
     }
   };
 
   // Attempt autoplay on mount (might be blocked by browser)
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = 0; // Start at 0
-      
-      const fadeAudioIn = setInterval(() => {
-        if (audioRef.current) {
-          if (audioRef.current.volume < 0.4) {
-            audioRef.current.volume = Math.min(0.4, audioRef.current.volume + 0.05);
-          } else {
-            clearInterval(fadeAudioIn);
-          }
-        }
-      }, 200);
+    if (!audioRef.current) return;
+    audioRef.current.volume = 0;
+    attemptPlay();
+  }, []);
 
-      // Attempt play
-      const playPromise = audioRef.current.play();
-      if (playPromise !== undefined) {
-          playPromise
-            .then(() => {
-                setIsPlaying(true);
-            })
-            .catch(error => {
-                console.log("Autoplay blocked:", error);
-                setIsPlaying(false); // UI shows muted state
-            });
-      }
-      
-      return () => clearInterval(fadeAudioIn);
-    }
+  useEffect(() => {
+    const handleExternalRequest = () => {
+      attemptPlay();
+    };
+
+    window.addEventListener("birthday:play-music", handleExternalRequest);
+    return () => window.removeEventListener("birthday:play-music", handleExternalRequest);
   }, []);
 
   return (

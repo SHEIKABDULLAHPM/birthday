@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { BIRTHDAY_DATE, REVEAL_MESSAGE, WAITING_MESSAGE } from "@/lib/constants";
+import { motion } from "framer-motion";
+import { BIRTHDAY_DATE, WAITING_MESSAGE } from "@/lib/constants";
 
 interface CountdownTimerProps {
   onComplete: () => void;

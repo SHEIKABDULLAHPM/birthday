@@ -17,7 +17,7 @@ export default function BirthdayExplosion() {
 
     const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
 
-    const interval: any = setInterval(function() {
+    const interval: ReturnType<typeof setInterval> = setInterval(function() {
       const timeLeft = animationEnd - Date.now();
 
       if (timeLeft <= 0) {
@@ -32,13 +32,13 @@ export default function BirthdayExplosion() {
   };
 
   return (
-    <section className="py-20 text-center relative z-20 overflow-hidden">
+    <section className="w-full max-w-4xl mx-auto px-4 md:px-8 text-center relative z-10 overflow-hidden">
       {!exploded ? (
         <motion.button
-          whileHover={{ scale: 1.1 }}
+          whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={triggerExplosion}
-          className="group relative px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full text-white font-bold text-xl shadow-lg hover:shadow-pink-500/50 transition-all"
+          className="group relative px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full text-white font-bold text-lg sm:text-xl shadow-lg hover:shadow-pink-500/50 transition-all"
         >
           <span className="relative z-10">Make a Wish! 🕯️</span>
           <div className="absolute inset-0 rounded-full bg-white/20 blur-md group-hover:blur-xl transition-all" />
@@ -48,15 +48,15 @@ export default function BirthdayExplosion() {
            initial={{ scale: 0.5, opacity: 0 }}
            animate={{ scale: 1, opacity: 1 }}
            transition={{ type: "spring", bounce: 0.5 }}
-           className="space-y-6"
+           className="space-y-4 md:space-y-6"
         >
-          <h2 className="text-6xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-br from-yellow-300 via-pink-500 to-purple-500 drop-shadow-[0_5px_5px_rgba(0,0,0,0.5)]">
+          <h2 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-br from-yellow-300 via-pink-500 to-purple-500 drop-shadow-[0_5px_5px_rgba(0,0,0,0.5)] leading-tight">
             HAPPY BIRTHDAY!
           </h2>
-          <p className="text-2xl text-pink-200">
+          <p className="text-lg sm:text-xl md:text-2xl text-pink-200">
             May all your dreams come true! ❤️
           </p>
-          <div className="flex justify-center gap-4 text-4xl animate-bounce pt-8">
+          <div className="flex justify-center gap-3 sm:gap-4 text-3xl sm:text-4xl animate-bounce pt-6 md:pt-8">
             🎉 🎂 🎁 🎈
           </div>
         </motion.div>

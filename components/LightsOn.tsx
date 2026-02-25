@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Lightbulb } from "lucide-react";
 import { BIRTHDAY_WISHES } from "@/lib/constants";
@@ -13,25 +13,45 @@ interface LightsOnProps {
 export default function LightsOn({ onComplete, onLightsOnStart }: LightsOnProps) {
   const [isLightsOn, setIsLightsOn] = useState(false);
   const [wishIndex, setWishIndex] = useState(0);
+  const [showMusicPrompt, setShowMusicPrompt] = useState(false);
+  const [hasStartedMusic, setHasStartedMusic] = useState(false);
   const [showWishes, setShowWishes] = useState(false);
+  const [isComplete, setIsComplete] = useState(false);
+
+  // Handle completion outside of render cycle
+  useEffect(() => {
+    if (isComplete) {
+      onComplete();
+    }
+  }, [isComplete, onComplete]);
 
   const handleLightsOn = () => {
     setIsLightsOn(true);
     if (onLightsOnStart) onLightsOnStart();
-    // Start showing wishes after a brief delay for light expansion
-    setTimeout(() => setShowWishes(true), 1500);
+    // Show music prompt after light expands
+    setTimeout(() => setShowMusicPrompt(true), 1500);
   };
 
-  const handleNextWish = () => {
-    // Prevent race conditions with rapid clicks
-    setWishIndex((prev) => {
-      if (prev >= BIRTHDAY_WISHES.length - 1) {
-        onComplete();
-        return prev;
-      }
-      return prev + 1;
-    });
-  };
+  const handleStartMusic = useCallback(() => {
+    if (hasStartedMusic) return;
+    setHasStartedMusic(true);
+    setShowMusicPrompt(false);
+
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("birthday:play-music"));
+    }
+
+    // Reveal wishes shortly after music starts
+    setTimeout(() => setShowWishes(true), 600);
+  }, [hasStartedMusic]);
+
+  const handleNextWish = useCallback(() => {
+    if (wishIndex >= BIRTHDAY_WISHES.length - 1) {
+      setIsComplete(true);
+    } else {
+      setWishIndex((prev) => prev + 1);
+    }
+  }, [wishIndex]);
 
   const currentWish = BIRTHDAY_WISHES[wishIndex] || "";
 
@@ -68,45 +88,78 @@ export default function LightsOn({ onComplete, onLightsOnStart }: LightsOnProps)
         />
       )}
 
+      {/* Music Prompt */}
+      <AnimatePresence>
+        {showMusicPrompt && !hasStartedMusic && (
+          <motion.div
+            key="music-prompt"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.4 }}
+            className="absolute inset-0 flex flex-col items-center justify-center gap-6 text-center px-6"
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="text-sm uppercase tracking-[0.4em] text-white/50"
+            >
+              Let the soundtrack begin
+            </motion.div>
+            <motion.button
+              onClick={handleStartMusic}
+              whileHover={{ scale: 1.05, boxShadow: "0 0 25px rgba(236,72,153,0.4)" }}
+              whileTap={{ scale: 0.96 }}
+              className="px-10 py-4 rounded-full border border-pink-400/60 bg-pink-500/20 text-white text-lg font-semibold tracking-wide backdrop-blur-md"
+            >
+              Turn on the Music 🎵
+            </motion.button>
+            <p className="text-white/50 text-xs uppercase tracking-[0.3em]">Tap to continue</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Sequential Wishes */}
       <AnimatePresence mode="wait">
         {showWishes && currentWish && (
-            <motion.div
-                key={wishIndex}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0, scale: 0.9, filter: "blur(10px)" }}
-                transition={{ duration: 0.5 }}
-                onClick={handleNextWish}
-                className="absolute inset-0 flex flex-col items-center justify-center p-8 cursor-pointer text-center z-50"
-            >
-                <div className="max-w-4xl">
-                  {currentWish.split("").map((char, index) => (
-                    <motion.span
-                      key={index}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ 
-                        duration: 0.05, 
-                        delay: index * 0.03 + 0.5, // Start typing after fade-in
-                        ease: "easeOut"
-                      }}
-                      className="inline-block text-3xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-200 to-indigo-200 leading-tight"
-                    >
-                      {char === " " ? "\u00A0" : char}
-                    </motion.span>
-                  ))}
-                </div>
-                
-                <motion.p 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 0.5 }}
-                    transition={{ delay: currentWish.length * 0.03 + 1.5 }}
-                    className="absolute bottom-20 text-sm text-white/30 tracking-widest uppercase animate-pulse"
+          <motion.div
+            key={wishIndex}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, scale: 0.9, filter: "blur(10px)" }}
+            transition={{ duration: 0.5 }}
+            onClick={handleNextWish}
+            className="absolute inset-0 flex flex-col items-center justify-center p-8 cursor-pointer text-center z-50"
+          >
+            <div className="max-w-4xl">
+              {/* Array.from keeps emoji graphemes intact while animating */}
+              {Array.from(currentWish).map((char, index) => (
+                <motion.span
+                  key={index}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration: 0.05,
+                    delay: index * 0.03 + 0.5,
+                    ease: "easeOut",
+                  }}
+                  className="inline-block text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-200 to-indigo-200 leading-tight"
                 >
-                    (Tap to continue)
-                </motion.p>
-            </motion.div>
+                  {char === " " ? "\u00A0" : char}
+                </motion.span>
+              ))}
+            </div>
+
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.5 }}
+              transition={{ delay: currentWish.length * 0.03 + 1.5 }}
+              className="absolute bottom-20 text-sm text-white/30 tracking-widest uppercase animate-pulse"
+            >
+              (Tap to continue)
+            </motion.p>
+          </motion.div>
         )}
       </AnimatePresence>
 

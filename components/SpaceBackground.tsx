@@ -1,24 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+
+const STAR_COUNT = 200;
+
+const createStars = () =>
+  Array.from({ length: STAR_COUNT }, (_, i) => ({
+    id: i,
+    style: {
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      animationDelay: `${Math.random() * 5}s`,
+      opacity: Math.random(),
+      transform: `scale(${Math.random() * 0.5 + 0.5})`,
+    },
+  }));
 
 export default function SpaceBackground() {
-  const [stars, setStars] = useState<{ id: number; style: React.CSSProperties }[]>([]);
-
-  useEffect(() => {
-    const starCount = 200;
-    const newStars = Array.from({ length: starCount }, (_, i) => ({
-      id: i,
-      style: {
-        left: `${Math.random() * 100}%`,
-        top: `${Math.random() * 100}%`,
-        animationDelay: `${Math.random() * 5}s`,
-        opacity: Math.random(),
-        transform: `scale(${Math.random() * 0.5 + 0.5})`,
-      },
-    }));
-    setStars(newStars);
-  }, []);
+  const [stars] = useState<{ id: number; style: React.CSSProperties }[]>(createStars);
 
   return (
     <div className="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
