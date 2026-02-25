@@ -1,5 +1,5 @@
 // Format: YYYY-MM-DDTHH:mm:ss
-export const BIRTHDAY_DATE = "2026-02-26T02:00:30"; // Set to 2 AM on the birthday for better timezone handling
+export const BIRTHDAY_DATE = "2026-02-25T02:09:46"; // Set to 2 AM on the birthday for better timezone handling
 export const PASSWORD = "hbd"; // Simple password for now
 export const WAITING_MESSAGE = "Something special is waiting for you... 🤫";
 export const REVEAL_MESSAGE = "Happy Birthday! 🎉";
