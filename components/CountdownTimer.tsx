@@ -30,6 +30,9 @@ export default function CountdownTimer({ onComplete }: CountdownTimerProps) {
       } else {
         setTimeLeft(null);
         onComplete();
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("birthday:unlock-music"));
+        }
       }
     };
 

@@ -7,10 +7,20 @@ import { BACKGROUND_MUSIC_URL } from "@/lib/constants";
 
 export default function MusicPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [showLockedHint, setShowLockedHint] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const lockHintTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const togglePlay = () => {
     if (!audioRef.current) return;
+    if (!isUnlocked) {
+      if (lockHintTimeout.current) clearTimeout(lockHintTimeout.current);
+      setShowLockedHint(true);
+      lockHintTimeout.current = setTimeout(() => setShowLockedHint(false), 1800);
+      return;
+    }
+
     if (isPlaying) {
       audioRef.current.pause();
       setIsPlaying(false);
@@ -36,7 +46,7 @@ export default function MusicPlayer() {
   };
 
   const attemptPlay = () => {
-    if (!audioRef.current) return;
+    if (!audioRef.current || !isUnlocked) return;
     smoothFadeIn();
     const playPromise = audioRef.current.play();
     if (playPromise !== undefined) {
@@ -51,19 +61,35 @@ export default function MusicPlayer() {
     }
   };
 
-  // Prepare audio element but wait for explicit trigger (timer completion)
   useEffect(() => {
-    if (!audioRef.current) return;
-    audioRef.current.volume = 0;
+    const handleUnlock = () => {
+      if (audioRef.current) {
+        audioRef.current.volume = 0;
+      }
+      setIsUnlocked(true);
+    };
+
+    window.addEventListener("birthday:unlock-music", handleUnlock);
+    return () => window.removeEventListener("birthday:unlock-music", handleUnlock);
   }, []);
 
   useEffect(() => {
     const handleExternalRequest = () => {
-      attemptPlay();
+      if (isUnlocked) {
+        attemptPlay();
+      }
     };
 
     window.addEventListener("birthday:play-music", handleExternalRequest);
     return () => window.removeEventListener("birthday:play-music", handleExternalRequest);
+  }, [isUnlocked]);
+
+  useEffect(() => {
+    return () => {
+      if (lockHintTimeout.current) {
+        clearTimeout(lockHintTimeout.current);
+      }
+    };
   }, []);
 
   return (
@@ -121,6 +147,19 @@ export default function MusicPlayer() {
             </div>
         )}
       </motion.div>
+
+      <AnimatePresence>
+        {showLockedHint && !isUnlocked && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            className="mt-2 text-xs uppercase tracking-[0.3em] text-white/60 text-center"
+          >
+            Wait for the countdown ⏳
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
